@@ -1,0 +1,61 @@
+# builder step used to download and configure spark environment
+FROM openjdk:11.0.11-jre-slim-buster as build
+
+# Add Dependencies for PySpark
+RUN apt-get update && apt-get install -y curl vim wget software-properties-common ssh net-tools ca-certificates python3 python3-pip python3-numpy python3-matplotlib python3-scipy python3-pandas python3-simpy
+
+RUN update-alternatives --install "/usr/bin/python" "python" "$(which python3)" 1
+
+# Fix the value of PYTHONHASHSEED
+# Note: this is needed when you use Python 3.3 or greater
+ENV SPARK_VERSION=3.2.1 \
+HADOOP_VERSION=3.2 \
+SPARK_HOME=/opt/spark \
+PYTHONHASHSEED=1
+
+# Download and uncompress spark from the apache archive
+RUN wget --no-verbose -O apache-spark.tgz "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" \
+&& mkdir -p /opt/spark \
+&& tar -xf apache-spark.tgz -C /opt/spark --strip-components=1 \
+&& rm apache-spark.tgz
+
+# Apache spark environment
+
+FROM openjdk:11.0.11-jre-slim-buster
+
+ARG spark_uid=185
+
+RUN set -ex && \
+    sed -i 's/http:\/\/deb.\(.*\)/https:\/\/deb.\1/g' /etc/apt/sources.list && \
+    apt-get update && \
+    ln -s /lib /lib64 && \
+    apt install -y bash tini libc6 libpam-modules krb5-user libnss3 procps && \
+    mkdir -p /opt/spark && \
+    mkdir -p /opt/spark/work-dir && \
+    mkdir /opt/spark/app-jars && \
+    touch /opt/spark/RELEASE && \
+    # delete the following line in prod
+    echo "Hello, Vijay-1633" > /opt/spark/app-jars/vj_2022-05-04-1633.txt && \
+    rm /bin/sh && \
+    ln -sv /bin/bash /bin/sh && \
+    echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
+    chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
+    rm -rf /var/cache/apt/*
+
+COPY --from=build /opt/spark/jars /opt/spark/jars
+COPY --from=build /opt/spark/bin /opt/spark/bin
+COPY --from=build /opt/spark/sbin /opt/spark/sbin
+COPY --from=build /opt/spark/kubernetes/dockerfiles/spark/entrypoint.sh /opt/
+COPY --from=build /opt/spark/kubernetes/dockerfiles/spark/decom.sh /opt/
+
+ENV SPARK_HOME /opt/spark
+
+WORKDIR /opt/spark/work-dir
+RUN chmod g+w /opt/spark/work-dir
+RUN chmod a+x /opt/decom.sh
+
+# COPY target//spark-on-k8s-vj-1.0.0-SNAPSHOT-jar-with-dependencies.jar ./spark-on-k8s.jar
+
+ENTRYPOINT [ "/opt/entrypoint.sh" ]
+
+USER ${spark_uid}
