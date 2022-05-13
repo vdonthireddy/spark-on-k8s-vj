@@ -24,12 +24,12 @@ public class WordCountVj {
             System.out.println(ex.getMessage());
         }
 
-        if (!isLocal) {
-            System.out.println("Done!");
-            while (true) {
-                Thread.sleep(10000);
-            }
-        }
+//        if (!isLocal) {
+//            System.out.println("Done!");
+//            while (true) {
+//                Thread.sleep(10000);
+//            }
+//        }
     }
 
     private static void writeRDD(String[] args) throws URISyntaxException {

@@ -40,7 +40,7 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 kubectl cluster-info
 
 #Use the following variables and run the commands:
-IMAGE_NAME=spark-wordcount:4.0
+IMAGE_NAME=spark-wordcount:8.0
 DOCKER_APP_REPO_URL=vdonthireddy
 K8S_MASTER_URL=k8s://https://127.0.0.1:52845
 APP_NAME=spark-wordcount
@@ -55,7 +55,7 @@ docker build -t ${IMAGE_NAME} .
 docker tag ${IMAGE_NAME} ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
 docker push ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
 
-kubectl get pods
+kubectl get pods -n ${K8S_NAMESPACE}
 cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
 --master ${K8S_MASTER_URL} \
 --deploy-mode cluster \
