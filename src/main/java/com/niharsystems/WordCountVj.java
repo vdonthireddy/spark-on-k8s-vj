@@ -23,6 +23,7 @@ public class WordCountVj {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+        Thread.sleep(120000);
 
 //        if (!isLocal) {
 //            System.out.println("Done!");

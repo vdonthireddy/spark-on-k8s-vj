@@ -28,7 +28,7 @@ kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSI
 k create -f ./setup.yaml
 
 #Get the token
-kubectl -n kubernetes-dashboard describe secret admin-user-token | grep ^token
+kubectl -n kubernetes-dashboard describe secret admin-user-token | grep token: | awk '{print $2}' | pbcopy
 
 #start the proxy to k8s APIs
 kubectl proxy
@@ -39,18 +39,38 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 #Get the kubernetes master url from the following command:
 kubectl cluster-info
 
+#To build a simple java container:
+DOCKER_SIMPLE_VERSION=3.0
+docker rmi -f vjbox
+docker build -t vjbox . -f ./Dockerfile_simple
+docker run vjbox
+docker tag vjbox vdonthireddy/vjbox:${DOCKER_SIMPLE_VERSION}
+docker push vdonthireddy/vjbox:${DOCKER_SIMPLE_VERSION}
+
+#To build a simple java container:
+DOCKER_OBSERVER_VERSION=1.0
+docker rmi -f observerbox
+docker build -t observerbox . -f ./Dockerfile_observer
+docker run observerbox
+docker tag observerbox vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
+docker push vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
+
 #Use the following variables and run the commands:
-IMAGE_NAME=spark-wordcount:8.0
+IMAGE_NAME=spark-wordcount:9.0
 DOCKER_APP_REPO_URL=vdonthireddy
 K8S_MASTER_URL=k8s://https://127.0.0.1:52845
-APP_NAME=spark-wordcount
+APP_NAME=sa-spark-driver
 NUMBER_OF_EXECUTOR_INSTANCES=2
 CLASS_NAME=com.niharsystems.WordCountVj
 JAR_FILE=spark-on-k8s.jar
 INPUT_FILE=USvideos.csv
 K8S_AUTH_SERVICE_ACCOUNT_NAME=sa-spark-driver
 K8S_NAMESPACE=spark-on-k8s
+POD_NAME=sa-spark-driver
+CONTAINER_NAME=sa-spark-driver-wordcount
 
+cd /Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj
+mvn clean install -DskipTests=true
 docker build -t ${IMAGE_NAME} .
 docker tag ${IMAGE_NAME} ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
 docker push ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
@@ -61,8 +81,61 @@ cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
 --deploy-mode cluster \
 --name ${APP_NAME} \
 --conf spark.executor.instances=${NUMBER_OF_EXECUTOR_INSTANCES} \
+--conf spark.kubernetes.driver.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
+--conf spark.kubernetes.executor.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
 --conf spark.kubernetes.authenticate.driver.serviceAccountName=${K8S_AUTH_SERVICE_ACCOUNT_NAME} \
+--conf spark.kubernetes.driver.podTemplateContainerName=${CONTAINER_NAME} \
+--conf spark.kubernetes.executor.podTemplateContainerName=${CONTAINER_NAME} \
 --conf spark.kubernetes.namespace=${K8S_NAMESPACE} \
 --conf spark.kubernetes.container.image=${DOCKER_APP_REPO_URL}/${IMAGE_NAME} \
 --class ${CLASS_NAME} \
 local:///opt/spark/app-jars/${JAR_FILE} /opt/spark/app-jars/${INPUT_FILE}
+
+
+IMAGE_NAME=spark-wordcount:9.0
+DOCKER_APP_REPO_URL=vdonthireddy
+K8S_MASTER_URL=k8s://https://127.0.0.1:52845
+APP_NAME=sa-spark-driver
+NUMBER_OF_EXECUTOR_INSTANCES=2
+CLASS_NAME=com.niharsystems.WordCountVj
+JAR_FILE=spark-on-k8s.jar
+INPUT_FILE=USvideos.csv
+K8S_AUTH_SERVICE_ACCOUNT_NAME=sa-spark-driver
+K8S_NAMESPACE=spark-on-k8s
+POD_NAME=sa-spark-driver
+CONTAINER_NAME=sa-spark-driver-wordcount
+
+kubectl get pods -n ${K8S_NAMESPACE}
+kubectl delete pod ${POD_NAME} -n ${K8S_NAMESPACE}
+cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
+--master ${K8S_MASTER_URL} \
+--deploy-mode cluster \
+--name ${APP_NAME} \
+--conf spark.executor.instances=${NUMBER_OF_EXECUTOR_INSTANCES} \
+--conf spark.kubernetes.driver.pod.name=${POD_NAME} \
+--conf spark.kubernetes.driver.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
+--conf spark.kubernetes.executor.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
+--conf spark.kubernetes.authenticate.driver.serviceAccountName=${K8S_AUTH_SERVICE_ACCOUNT_NAME} \
+--conf spark.kubernetes.driver.podTemplateContainerName=${CONTAINER_NAME} \
+--conf spark.kubernetes.executor.podTemplateContainerName=${CONTAINER_NAME} \
+--conf spark.kubernetes.namespace=${K8S_NAMESPACE} \
+--conf spark.kubernetes.container.image=${DOCKER_APP_REPO_URL}/${IMAGE_NAME} \
+--class ${CLASS_NAME} \
+local:///opt/spark/app-jars/${JAR_FILE} /opt/spark/app-jars/${INPUT_FILE}
+
+
+
+#kubectl get pods -n ${K8S_NAMESPACE}
+#cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
+#--master ${K8S_MASTER_URL} \
+#--deploy-mode cluster \
+#--name ${APP_NAME} \
+#--conf spark.kubernetes.driver.pod.name=${POD_NAME} \
+#--conf spark.executor.instances=${NUMBER_OF_EXECUTOR_INSTANCES} \
+#--conf spark.kubernetes.authenticate.driver.serviceAccountName=${K8S_AUTH_SERVICE_ACCOUNT_NAME} \
+#--conf spark.kubernetes.namespace=${K8S_NAMESPACE} \
+#--conf spark.kubernetes.container.image=${DOCKER_APP_REPO_URL}/${IMAGE_NAME} \
+#--conf spark.kubernetes.driver.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
+#--conf spark.kubernetes.executor.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
+#--class ${CLASS_NAME} \
+#local:///opt/spark/app-jars/${JAR_FILE} /opt/spark/app-jars/${INPUT_FILE}

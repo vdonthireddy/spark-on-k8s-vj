@@ -23,6 +23,7 @@ rules:
   - pods
   - secrets
   - endpoints
+  - persistentvolumeclaims
   verbs:
   - get
   - watch
