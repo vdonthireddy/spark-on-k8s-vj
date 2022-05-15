@@ -4,6 +4,13 @@ spec:
   shareProcessNamespace: true
   containers:
     - name: sa-spark-driver-wordcount
+      env:
+        - name: NAME
+          value: "Vijay-sa-spark-driver-wordcount"
+        - name: POD_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
       livenessProbe:
         exec:
           command:
@@ -14,6 +21,13 @@ spec:
         - name: logging-volume
           mountPath: /logging-volume
     - name: pods-vjbox-container
+      env:
+        - name: NAME
+          value: "Vijay-pods-vjbox-container"
+        - name: POD_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
       image: vdonthireddy/vjbox:2.0
       args:
         - /bin/sh
@@ -23,7 +37,14 @@ spec:
         - name: logging-volume
           mountPath: /logging-volume
     - name: observerbox
-      image: vdonthireddy/observerbox:1.0
+      env:
+        - name: NAME
+          value: "Vijay-observerbox"
+        - name: POD_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+      image: vdonthireddy/observerbox:centos
       args:
         - /bin/bash
         - ./terminate.sh
@@ -33,17 +54,3 @@ spec:
   volumes:
     - name: logging-volume
       emptyDir: {}
-
-#      - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
-
-#      args:
-#        - /bin/sh
-#        - -c
-#        - touch /logging-volume/healthy; sleep 30
-#      livenessProbe:
-#        exec:
-#          command:
-#            - cat
-#            - /logging-volume/healthy
-#        initialDelaySeconds: 5
-#        periodSeconds: 5

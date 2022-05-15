@@ -48,7 +48,7 @@ docker tag vjbox vdonthireddy/vjbox:${DOCKER_SIMPLE_VERSION}
 docker push vdonthireddy/vjbox:${DOCKER_SIMPLE_VERSION}
 
 #To build a simple java container:
-DOCKER_OBSERVER_VERSION=1.0
+DOCKER_OBSERVER_VERSION=centos
 docker rmi -f observerbox
 docker build -t observerbox . -f ./Dockerfile_observer
 docker run observerbox
@@ -56,7 +56,7 @@ docker tag observerbox vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
 docker push vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
 
 #Use the following variables and run the commands:
-IMAGE_NAME=spark-wordcount:9.0
+IMAGE_NAME=spark-wordcount:10.0
 DOCKER_APP_REPO_URL=vdonthireddy
 K8S_MASTER_URL=k8s://https://127.0.0.1:52845
 APP_NAME=sa-spark-driver
@@ -92,7 +92,7 @@ cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
 local:///opt/spark/app-jars/${JAR_FILE} /opt/spark/app-jars/${INPUT_FILE}
 
 
-IMAGE_NAME=spark-wordcount:9.0
+IMAGE_NAME=spark-wordcount:10.0
 DOCKER_APP_REPO_URL=vdonthireddy
 K8S_MASTER_URL=k8s://https://127.0.0.1:52845
 APP_NAME=sa-spark-driver
