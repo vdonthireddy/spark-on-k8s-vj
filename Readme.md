@@ -28,6 +28,7 @@ kubectl proxy
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 ```
 
+### Run the following script in your terminal to submit a spark job to your cluster. You can view the result in dashboard.
 ```
 IMAGE_NAME=spark-wordcount:4.0
 DOCKER_APP_REPO_URL=vdonthireddy
