@@ -16,41 +16,66 @@ spec:
           command:
             - /bin/sh
             - -c
-            - echo healthy at $(date) > /logging-volume/healthy
+            - echo healthy at $(date) > /health-check/healthy
       volumeMounts:
-        - name: logging-volume
-          mountPath: /logging-volume
+        - name: health-check
+          mountPath: /health-check
     - name: pods-vjbox-container
+      livenessProbe:
+        exec:
+          command:
+            - sh
+            - -c
+            - |-
+              MOUNT_PATH="/health-check"
+              FILE_TO_WATCH="$MOUNT_PATH/healthy"
+              LAST_HEARTBEAT=$(stat -c %Y $FILE_TO_WATCH)
+              ELAPSED_TIME_SINCE_AFTER_HEARTBEAT=$(expr $(date +%s) - $LAST_HEARTBEAT)
+              HEARTBEAT_TIMEOUT_THRESHOLD=30
+              echo healthy at date=$(date) - LAST_HEARTBEAT=$LAST_HEARTBEAT - ELAPSED_TIME_SINCE_AFTER_HEARTBEAT=$ELAPSED_TIME_SINCE_AFTER_HEARTBEAT >> /health-check/terminated.txt
+              if [ "$ELAPSED_TIME_SINCE_AFTER_HEARTBEAT" -gt "$HEARTBEAT_TIMEOUT_THRESHOLD" ]; then $HEALTHY=0; fi
+        initialDelaySeconds: 20
+        periodSeconds: 10
       env:
+        - name: HEALTHY
+          value: 1
         - name: NAME
           value: "Vijay-pods-vjbox-container"
         - name: POD_UID
           valueFrom:
             fieldRef:
               fieldPath: metadata.uid
-      image: vdonthireddy/vjbox:2.0
+      image: vdonthireddy/vjbox:4.0
       args:
         - /bin/sh
         - -c
-        - while :; do echo "healthcheck" > /logging-volume/pods-vjbox-container.txt; sleep 10 ; done
+        - |-
+          while :; 
+          do 
+            if [ $HEALTHY -eq 0 ]; then
+              break
+            fi
+            echo "healthcheck" > /health-check/pods-vjbox-container.txt; 
+            sleep 10; 
+          done
       volumeMounts:
-        - name: logging-volume
-          mountPath: /logging-volume
-    - name: observerbox
-      env:
-        - name: NAME
-          value: "Vijay-observerbox"
-        - name: POD_UID
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.uid
-      image: vdonthireddy/observerbox:centos
-      args:
-        - /bin/bash
-        - ./terminate.sh
-      volumeMounts:
-        - name: logging-volume
-          mountPath: /logging-volume
+        - name: health-check
+          mountPath: /health-check
+  #    - name: observerbox
+  #      env:
+  #        - name: NAME
+  #          value: "Vijay-observerbox"
+  #        - name: POD_UID
+  #          valueFrom:
+  #            fieldRef:
+  #              fieldPath: metadata.uid
+  #      image: vdonthireddy/observerbox:centos
+  #      args:
+  #        - /bin/bash
+  #        - ./terminate.sh
+  #      volumeMounts:
+  #        - name: health-check
+  #          mountPath: /health-check
   volumes:
-    - name: logging-volume
-      emptyDir: {}
+    - name: health-check
+      emptyDir: { }

@@ -1,4 +1,4 @@
-package com.niharsystems;
+package donthireddy.vijay;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
@@ -7,7 +7,6 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +22,7 @@ public class WordCountVj {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        Thread.sleep(300000);
+        Thread.sleep(20000);
 
 //        if (!isLocal) {
 //            System.out.println("Done!");

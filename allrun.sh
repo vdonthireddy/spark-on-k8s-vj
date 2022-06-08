@@ -40,7 +40,7 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 kubectl cluster-info
 
 #To build a simple java container:
-DOCKER_SIMPLE_VERSION=3.0
+DOCKER_SIMPLE_VERSION=4.0
 docker rmi -f vjbox
 docker build -t vjbox . -f ./Dockerfile_simple
 docker run vjbox
@@ -56,12 +56,12 @@ docker tag observerbox vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
 docker push vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
 
 #Use the following variables and run the commands:
-IMAGE_NAME=spark-wordcount:10.0
+IMAGE_NAME=spark-wordcount:11.0
 DOCKER_APP_REPO_URL=vdonthireddy
 K8S_MASTER_URL=k8s://https://127.0.0.1:52845
 APP_NAME=sa-spark-driver
 NUMBER_OF_EXECUTOR_INSTANCES=2
-CLASS_NAME=com.niharsystems.WordCountVj
+CLASS_NAME=donthireddy.vijay.WordCountVj
 JAR_FILE=spark-on-k8s.jar
 INPUT_FILE=USvideos.csv
 K8S_AUTH_SERVICE_ACCOUNT_NAME=sa-spark-driver
@@ -92,12 +92,12 @@ cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
 local:///opt/spark/app-jars/${JAR_FILE} /opt/spark/app-jars/${INPUT_FILE}
 
 
-IMAGE_NAME=spark-wordcount:10.0
+IMAGE_NAME=spark-wordcount:11.0
 DOCKER_APP_REPO_URL=vdonthireddy
 K8S_MASTER_URL=k8s://https://127.0.0.1:52845
 APP_NAME=sa-spark-driver
 NUMBER_OF_EXECUTOR_INSTANCES=2
-CLASS_NAME=com.niharsystems.WordCountVj
+CLASS_NAME=donthireddy.vijay.WordCountVj
 JAR_FILE=spark-on-k8s.jar
 INPUT_FILE=USvideos.csv
 K8S_AUTH_SERVICE_ACCOUNT_NAME=sa-spark-driver
