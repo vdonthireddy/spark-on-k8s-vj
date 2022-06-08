@@ -1,4 +1,4 @@
-#Execute the following commands in terminal to create the dashboard
+### Execute the following commands in terminal to create the dashboard
 ```
 brew install kind
 kind create cluster
@@ -10,17 +10,17 @@ kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSI
 k create -f ./setup.yaml
 ```
 
-#Get the token
+### Get the token
 ```
 kubectl -n kubernetes-dashboard describe secret admin-user-token | grep ^token
 ```
 
-#start the proxy to k8s APIs
+### Start the proxy to k8s APIs
 ```
 kubectl proxy
 ```
 
-#dashboard url is at:
+### Dashboard url is at:
 ```
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 ```
