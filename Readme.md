@@ -41,10 +41,10 @@ INPUT_FILE=USvideos.csv
 K8S_AUTH_SERVICE_ACCOUNT_NAME=sa-spark-driver
 K8S_NAMESPACE=spark-on-k8s
 
-
-docker build -t ${IMAGE_NAME} .
-docker tag ${IMAGE_NAME} ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
-docker push ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
+# Uncomment the following lines if you need to push a new version of docker image to your docker hub
+#docker build -t ${IMAGE_NAME} .
+#docker tag ${IMAGE_NAME} ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
+#docker push ${DOCKER_APP_REPO_URL}/${IMAGE_NAME}
 
 kubectl get pods
 cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
