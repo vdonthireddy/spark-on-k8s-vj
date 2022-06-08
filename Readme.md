@@ -1,8 +1,11 @@
-### Execute the following commands in terminal to create the dashboard
+### Setup a local kubernetes cluster using [kind](https://kind.sigs.k8s.io/)
 ```
 brew install kind
 kind create cluster
+```
 
+### Execute the following commands in terminal to create the dashboard
+```
 GITHUB_URL=https://github.com/kubernetes/dashboard/releases
 VERSION_KUBE_DASHBOARD=$(curl -w '%{url_effective}' -I -L -s -S ${GITHUB_URL}/latest -o /dev/null | sed -e 's|.*/||')
 kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSION_KUBE_DASHBOARD}/aio/deploy/recommended.yaml
