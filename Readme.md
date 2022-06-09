@@ -2,12 +2,12 @@
 
 #### Install [brew](https://brew.sh/) if you don't already have it installed on your Mac
 
-#### Setup a local kubernetes cluster using [kind](https://kind.sigs.k8s.io/)
+#### Install [kind](https://kind.sigs.k8s.io/), a tool to run local [Kubernetes](https://kubernetes.io/) clusters using Docker container "nodes". 
 ```
 brew install kind
 ```
 
-#### Install kubectl (required to connect to kubernetes cluster)
+#### Install [kubectl](https://kubernetes.io/docs/reference/kubectl/kubectl/) (required to connect to kubernetes cluster)
 ```
 brew install kubectl
 ```
