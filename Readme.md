@@ -1,3 +1,5 @@
+## Step-by-step instructions to run a spark job on kubernetes cluster on your Mac
+
 #### Make sure you have [docker desktop](https://www.docker.com/products/docker-desktop/) installed on your mac and running
 
 #### Install [brew](https://brew.sh/) if you don't already have it installed on your Mac
