@@ -56,9 +56,9 @@ docker tag observerbox vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
 docker push vdonthireddy/observerbox:${DOCKER_OBSERVER_VERSION}
 
 #Use the following variables and run the commands:
-IMAGE_NAME=spark-wordcount:11.0
+IMAGE_NAME=spark-wordcount:12.0
 DOCKER_APP_REPO_URL=vdonthireddy
-K8S_MASTER_URL=k8s://https://127.0.0.1:52845
+K8S_MASTER_URL=k8s://https://127.0.0.1:65369
 APP_NAME=sa-spark-driver
 NUMBER_OF_EXECUTOR_INSTANCES=2
 CLASS_NAME=donthireddy.vijay.WordCountVj
@@ -81,8 +81,6 @@ cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
 --deploy-mode cluster \
 --name ${APP_NAME} \
 --conf spark.executor.instances=${NUMBER_OF_EXECUTOR_INSTANCES} \
---conf spark.kubernetes.driver.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
---conf spark.kubernetes.executor.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
 --conf spark.kubernetes.authenticate.driver.serviceAccountName=${K8S_AUTH_SERVICE_ACCOUNT_NAME} \
 --conf spark.kubernetes.driver.podTemplateContainerName=${CONTAINER_NAME} \
 --conf spark.kubernetes.executor.podTemplateContainerName=${CONTAINER_NAME} \
@@ -90,6 +88,9 @@ cd ${SPARK_HOME} && ${SPARK_HOME}/bin/spark-submit \
 --conf spark.kubernetes.container.image=${DOCKER_APP_REPO_URL}/${IMAGE_NAME} \
 --class ${CLASS_NAME} \
 local:///opt/spark/app-jars/${JAR_FILE} /opt/spark/app-jars/${INPUT_FILE}
+
+--conf spark.kubernetes.driver.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
+--conf spark.kubernetes.executor.podTemplateFile=/Users/donthireddy/code/spark-on-k8s-vj/spark-on-k8s-vj/pod.yaml \
 
 
 IMAGE_NAME=spark-wordcount:11.0
