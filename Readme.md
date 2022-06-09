@@ -32,20 +32,21 @@ kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSI
 k create -f ./setup.yaml
 ```
 
-#### Get the token
-```
-kubectl -n kubernetes-dashboard describe secret admin-user-token | grep ^token
-```
-
 #### Start the proxy to k8s APIs (in a separate terminal) and keep it running
 ```
 kubectl proxy
 ```
 
-#### Dashboard url is at:
+#### Get the token (the following script copies the token into your clipboard)
+```
+kubectl -n kubernetes-dashboard describe secret admin-user-token | grep ^token
+```
+
+#### Dashboard url is at (paste the token copied into your clipboard from above script):
 ```
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 ```
+
 #### Get the kubernetes master url from the following command (pay attention to the port number and use it to replace the port number in env variable: K8S_MASTER_URL
 ```
 kubectl cluster-info
